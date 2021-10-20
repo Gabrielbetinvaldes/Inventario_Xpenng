@@ -18,7 +18,7 @@
   
   <div class="navbar-nav ">
     <div class="nav-item text-nowrap  bg-primary">
-      <a class="nav-link px-3  bg-primary" href="/">Salir</a>
+      <a class="nav-link px-3  bg-primary" href="/logout">Salir</a>
     </div>
   </div>
 </header>
@@ -42,9 +42,22 @@
     <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
       <div class="accordion-body">
 
+        {% if g.user[3] == '1' %}
+
         <a class="nav-link active" aria-current="page" href="/Dashboard/UsuarioSuper">Crear Usuarios</a>
         <a class="nav-link active" aria-current="page" href="/Dashboard/UsuarioAdmin">Gestionar Usuarios</a>
-      
+        
+        {% elif g.user[3] == '2' %}
+
+        <a class="nav-link active" aria-current="page" href="/Dashboard/UsuarioAdmin">Gestionar Usuarios</a>
+        
+        {% else %}
+
+       <Label>NO TIENE ACCESO A ESTE MODULO</Label>
+       
+           
+        
+        {% endif %} 
       </div>
     </div>
   </div>
@@ -58,9 +71,21 @@
     <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
       <div class="accordion-body">
 
+        {% if g.user[3] == '1' %}
+
         <a class="nav-link active" aria-current="page" href="/Dashboard/ProductoAdmin">Crear Productos</a>
         <a class="nav-link active" aria-current="page" href="/Dashboard/ProductoUsuario">Gestionar Productos</a>
       
+
+        {% elif g.user[3] == '2' %}
+
+        <a class="nav-link active" aria-current="page" href="/Dashboard/ProductoAdmin">Crear Productos</a>
+      
+        {% else %}
+
+        <a class="nav-link active" aria-current="page" href="/Dashboard/ProductoUsuario">Gestionar Productos</a>
+
+        {% endif %}      
       </div>
     </div>
   </div>
@@ -75,10 +100,25 @@
     <div id="panelsStayOpen-collapseFour" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingFour" data-bs-parent="#accordionExample">
       <div class="accordion-body">
         
+        {% if g.user[3] == '1' %}
+
         <a class="nav-link active" aria-current="page" href="/Dashboard/ProveedorAdmin">Crear Proveedor</a>
         <a class="nav-link active" aria-current="page" href="/Dashboard/ProveedorEmpleado">Buscar Proveedor</a>
       
-      </div>
+
+        {% elif g.user[3] == '2' %}
+
+        <a class="nav-link active" aria-current="page" href="/Dashboard/ProveedorAdmin">Crear Proveedor</a>
+      
+        {% else  %}
+
+        <a class="nav-link active" aria-current="page" href="/Dashboard/ProveedorEmpleado">Buscar Proveedor</a>
+
+        
+        
+        {% endif %} 
+
+            </div>
     </div>
   </div>
 

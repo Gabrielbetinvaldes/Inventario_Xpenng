@@ -11,6 +11,8 @@ from flask import session, g
 from utils import isUsernameValid, isEmailValid, isPasswordValid
 import yagmail as yagmail
 import random
+import functools
+from flask import make_response
 
 
 
@@ -21,10 +23,38 @@ app.secret_key = os.urandom(24)
 
 #--------------------------------------------------------------------------------------------------
 
+# Para confirmar esta logueado o no / bloquea el acceso a dashboard con el login required
+@app.route('/')
+@app.route('/index')
+def index():
+    if g.user:
+        return redirect( url_for('dashboard') )
+    else:    
+        return redirect(url_for( 'sesion' ))
+
+def login_required(view):
+    @functools.wraps( view ) # toma una función utilizada en un decorador y añadir la funcionalidad de copiar el nombre de la función.
+    def wrapped_view(**kwargs):
+        if g.user is None:
+            return redirect( url_for( 'sesion' ) )
+        return view( **kwargs )
+    return wrapped_view  
+
+@app.route('/Dashboard', methods=['GET', 'POST'])
+@login_required
+def dashboard():
+    
+     
+    return render_template("Dashboard.html" ) 
+    
+
 # Inicio de session
-@app.route('/', methods=['GET', 'POST'])
+
+@app.route('/login', methods=['GET', 'POST'])
+
 def sesion():
-  
+
+        
     if request.method == 'POST':
         db = get_db()
         usuario = request.form['usuario']
@@ -43,7 +73,7 @@ def sesion():
             return render_template("sesion.html")
         else:         
             user = db.execute(
-                'SELECT id, usuario, contrasena, rol FROM Usuarios WHERE usuario = ?', (usuario,) 
+                'SELECT id_usuario, usuario, contrasena, rol, email FROM Usuarios WHERE usuario = ?', (usuario,) 
                 ).fetchone()
             print(user)
             if user is None:
@@ -57,10 +87,15 @@ def sesion():
                 else:
                     session.clear()
                     session['id_usuario'] = user[0]
-                    return redirect( 'Dashboard' )   
+                    response = make_response( redirect( url_for('dashboard') ) )
+                    response.set_cookie( 'username', usuario)
+                    
+                    return response
+                    
+                      
 
    # GET: 
-    return render_template("sesion.html")
+    return render_template("sesion.html"  )
 #--------------------------------------------------------------------------------------------------
 
 # Before Request
@@ -68,14 +103,20 @@ def sesion():
 def cargar_usuario_registrado():
     print("Entró en before_request.")
     id_usuario = session.get('id_usuario')
+    print("id_usuario:", id_usuario)
     if id_usuario is None:
         g.user = None
+        
     else:
         g.user = get_db().execute(
-            'SELECT id, usuario, contrasena, rol FROM Usuarios WHERE usuario = ?'
+            'SELECT id_usuario, usuario, contrasena, rol FROM Usuarios WHERE id_usuario = ?'
             ,
             (id_usuario,)
+            
         ).fetchone()
+    print(g.user)
+        
+       
 
 #---------------------------------------------------------------------------------------------------
 
@@ -83,8 +124,9 @@ def cargar_usuario_registrado():
  # para crear usuario   
 
 @app.route('/Dashboard/UsuarioSuper', methods=['GET', 'POST'])
+@login_required
 def usuario_super():
-
+    
     try:
         if request.method == 'POST':                  
             usuario = request.form['usuario'] 
@@ -150,6 +192,7 @@ def usuario_super():
  # Consultar usuarios       
 
 @app.route('/Dashboard/UsuarioSuper/select', methods=['GET', 'POST'])
+@login_required
 def consulta_super():
 
     if request.method == 'POST':  
@@ -172,6 +215,7 @@ def consulta_super():
     
 
 @app.route('/Dashboard/UsuarioAdmin/select', methods=['GET', 'POST'])
+@login_required
 def consulta_admin():
 
     if request.method == 'POST':  
@@ -197,10 +241,11 @@ def consulta_admin():
    
 @app.route('/Dashboard/UsuarioSuper/editarUsuario/<nom_usuario>', methods=['GET', 'POST'])
 @app.route('/Dashboard/UsuarioAdmin/editarUsuario/<nom_usuario>', methods=['GET', 'POST'])
+@login_required
 def editar_usuario(nom_usuario):
     if request.method == 'POST':                  
-            usuario = request.form['usuario']         
-            password = request.form['password']
+            usuario = request.form['usuario'] 
+            email = request.form['email']        
             rol = request.form['rol']    
 
             error = None
@@ -209,8 +254,8 @@ def editar_usuario(nom_usuario):
             if not usuario:
                 error = "Usuario requerido."
                 flash(error)
-            if not password:
-                error = "Contraseña requerida."
+            if not email:
+                error = "Email requerido."
                 flash(error)
             if not rol:
                 error = "Rol requerido."
@@ -221,10 +266,9 @@ def editar_usuario(nom_usuario):
                 return render_template("editarUsuario.html")
             else:
             # Seguro:
-                password_cifrado = generate_password_hash(password)
                 db.execute(
-                    'UPDATE Usuarios SET usuario = ?,contrasena = ?,rol = ? WHERE usuario = ?',
-                    (usuario,password_cifrado,rol,usuario)
+                    'UPDATE Usuarios SET usuario = ?,rol = ?, email =? WHERE usuario = ?',
+                    (usuario,rol,email,usuario)
                     )
                                              
                 db.commit()
@@ -249,7 +293,8 @@ def editar_usuario(nom_usuario):
 #Para Eliminar usuarios
 
 @app.route('/Dashboard/UsuarioSuper/eliminarUsuario/<nom_usuario>', methods=['GET', 'POST'])
-@app.route('/Dashboard/UsuarioAdmin/eliminarUsuario/<nom_usuario>', methods=['GET', 'POST'])    
+@app.route('/Dashboard/UsuarioAdmin/eliminarUsuario/<nom_usuario>', methods=['GET', 'POST'])
+@login_required    
 def eliminar_usuario(nom_usuario):
     if request.method == 'POST':                  
             usuario = request.form['usuario']         
@@ -293,6 +338,7 @@ def eliminar_usuario(nom_usuario):
 # Crear producto
 
 @app.route('/Dashboard/ProductoAdmin', methods=['GET', 'POST'])
+@login_required
 def producto_admin():
 
     if request.method == 'POST':                  
@@ -353,6 +399,7 @@ def producto_admin():
  # Consultar productos      
 
 @app.route('/Dashboard/ProductoAdmin/select', methods=['GET', 'POST'])
+@login_required
 def consulta_producto_admin():
 
     if request.method == 'POST':
@@ -390,6 +437,7 @@ def consulta_producto_admin():
 
 
 @app.route('/Dashboard/ProductoUsuario/select', methods=['GET', 'POST'])
+@login_required
 def consulta_producto_usuario():
 
     if request.method == 'POST':
@@ -432,6 +480,7 @@ def consulta_producto_usuario():
    
 @app.route('/Dashboard/ProductoAdmin/editarProducto/<nom_producto>', methods=['GET', 'POST'])
 @app.route('/Dashboard/ProductoUsuario/editarProducto/<nom_producto>', methods=['GET', 'POST'])
+@login_required
 def editar_producto(nom_producto):
     if request.method == 'POST':  
 
@@ -499,7 +548,8 @@ def editar_producto(nom_producto):
 #Para Eliminar producto
 
 @app.route('/Dashboard/ProductoAdmin/eliminarProducto/<nom_producto>', methods=['GET', 'POST'])
-@app.route('/Dashboard/ProductoUsuario/eliminarProducto/<nom_producto>', methods=['GET', 'POST'])    
+@app.route('/Dashboard/ProductoUsuario/eliminarProducto/<nom_producto>', methods=['GET', 'POST'])
+@login_required    
 def eliminar_producto(nom_producto):
     if request.method == 'POST':                  
             nombre = request.form['nombre']         
@@ -542,6 +592,7 @@ def eliminar_producto(nom_producto):
 # Crear proveedor
 
 @app.route('/Dashboard/ProveedorAdmin', methods=['GET', 'POST'])
+@login_required
 def proveedor_admin():
 
     if request.method == 'POST':                  
@@ -596,6 +647,7 @@ def proveedor_admin():
 # Consultar proveedores      
 
 @app.route('/Dashboard/ProveedorAdmin/select', methods=['GET', 'POST'])
+@login_required
 def consulta_proveedor_admin():
 
     if request.method == 'POST':  
@@ -618,6 +670,7 @@ def consulta_proveedor_admin():
     
 
 @app.route('/Dashboard/ProveedorEmpleado/select', methods=['GET', 'POST'])
+@login_required
 def consulta_proveedor_empleado():
 
     if request.method == 'POST':  
@@ -642,26 +695,27 @@ def consulta_proveedor_empleado():
 
 #Plantillas
 
-@app.route('/Dashboard', methods=['GET', 'POST'])
-def dashboard():
-    return render_template("Dashboard.html")    
+   
 
 @app.route('/Dashboard/UsuarioAdmin', methods=['GET', 'POST'])
+@login_required
 def usuario_admin():
     return render_template("UsuarioAdmin.html")    
 
 
 @app.route('/Dashboard/ProductoUsuario', methods=['GET', 'POST'])
+@login_required
 def producto_usuario():
     return render_template("ProductoUsuario.html")
 
 
 # ------------------
-      
+       
 
- 
+
 
 @app.route('/Dashboard/ProveedorEmpleado', methods=['GET', 'POST'])
+@login_required
 def proveedor_empleado():
     return render_template("ProveedorEmpleado.html")   
 
@@ -669,8 +723,15 @@ def proveedor_empleado():
 
 @app.route('/Dashboard/ProveedorUsuario/editarProveedor', methods=['GET', 'POST'])
 @app.route('/Dashboard/ProveedorAdmin/editarProveedor', methods=['GET', 'POST'])
+@login_required
 def editar_proveedor():
     return render_template("editarProveedor.html")    
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect( 'login' )    
 
 #------------------------------------------------------------------------------------------------------
 
@@ -701,8 +762,6 @@ def sql_select_proveedores():
     proveedores= cursoObj.fetchall()  # [ [47,"Monitor",368000.0,23], [99,"Mouse",25000.0,64] ]
     print(proveedores)
     return proveedores
-
-
 
 
 
