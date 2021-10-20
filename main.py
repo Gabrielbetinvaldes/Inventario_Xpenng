@@ -338,7 +338,7 @@ def producto_admin():
             else:
           
                 db.execute(
-                    'INSERT INTO Productos (codigo,nombre,descripcion,cant_minima,stock,proveedor) VALUES (?,?,?,?,?,?)',
+                    'INSERT INTO Productos (codigo,nombre,descripcion,cant_minima,stock,id_proveedor) VALUES (?,?,?,?,?,?)',
                     (codigo,nombre,descripcion,cant_minima,stock,proveedor)
                     )
                                 
@@ -537,11 +537,108 @@ def eliminar_producto(nom_producto):
         return render_template("eliminarProducto.html",  productos = productos , nom_producto=nom_producto)
 
 
+#------------------------------------------------------------------------------------------------
+
+# Crear proveedor
+
+@app.route('/Dashboard/ProveedorAdmin', methods=['GET', 'POST'])
+def proveedor_admin():
+
+    if request.method == 'POST':                  
+                   
+            nombre = request.form['nombre']
+            telefono = request.form['telefono']
+            direccion = request.form['direccion']         
+            ciudad = request.form['ciudad']
+                  
+
+            error = None
+            db = get_db()
+
+           
+            if not nombre:
+                error = "Nombre requerido."
+                flash(error)
+            if not telefono:
+                error = "Numero telefonico requerido."
+                flash(error)
+            if not direccion:
+                error = "Direccion requerida."
+                flash(error)
+            if not ciudad:
+                error = "Ciudad requerida."
+                flash(error)
+                
+
+            nombre_proveedor = db.execute(
+                'SELECT * FROM Proveedores WHERE nombre = ? ', (nombre,) 
+                ).fetchone()
+            print(nombre)
+            if nombre_proveedor is not None:
+                error = "El nombre del proveedor ya existe."
+                flash(error)   
+            
+            if error is not None:
+                return render_template("ProveedorAdmin.html")
+            else:          
+                db.execute(
+                    'INSERT INTO Proveedores (nombre,telefono,direccion,ciudad) VALUES (?,?,?,?)',
+                    (nombre,telefono,direccion,ciudad)
+                    )
+                                
+                db.commit()
+                flash('Proveedor creado')
+
+    return render_template("ProveedorAdmin.html")   
 
 
 
+# Consultar proveedores      
 
-#--------------------------------------------------------------------------------------------
+@app.route('/Dashboard/ProveedorAdmin/select', methods=['GET', 'POST'])
+def consulta_proveedor_admin():
+
+    if request.method == 'POST':  
+        proveedor = request.form['nombre']
+
+        if not proveedor:
+            proveedores = sql_select_proveedores()
+        else: 
+            db = get_db()
+            proveedores = db.execute(
+            'SELECT * FROM Proveedores WHERE nombre = ? ', (proveedor,) 
+            ).fetchall()
+            if len(proveedores) < 1 :
+               error = "Proveedor NO existe."
+               flash(error) 
+            
+            
+  
+    return render_template("ProveedorAdmin.html", proveedores=proveedores)
+    
+
+@app.route('/Dashboard/ProveedorEmpleado/select', methods=['GET', 'POST'])
+def consulta_proveedor_empleado():
+
+    if request.method == 'POST':  
+        proveedor = request.form['nombre']
+
+        if not proveedor:
+            proveedores = sql_select_proveedores()
+        else: 
+            db = get_db()
+            proveedores = db.execute(
+            'SELECT * FROM Proveedores WHERE nombre = ? ', (proveedor,) 
+            ).fetchall()
+            if len(proveedores) < 1 :
+               error = "Proveedor NO existe."
+               flash(error) 
+      
+            
+  
+    return render_template("ProveedorEmpleado.html", proveedores=proveedores)
+
+#------------------------------------------------------------------------------------------------
 
 #Plantillas
 
@@ -562,9 +659,7 @@ def producto_usuario():
 # ------------------
       
 
-@app.route('/Dashboard/ProveedorAdmin', methods=['GET', 'POST'])
-def proveedor_admin():
-    return render_template("ProveedorAdmin.html")    
+ 
 
 @app.route('/Dashboard/ProveedorEmpleado', methods=['GET', 'POST'])
 def proveedor_empleado():
@@ -597,6 +692,15 @@ def sql_select_productos():
     productos= cursoObj.fetchall()  # [ [47,"Monitor",368000.0,23], [99,"Mouse",25000.0,64] ]
     print(productos)
     return productos
+
+def sql_select_proveedores():
+    sql = "SELECT * FROM Proveedores"
+    conn = get_db()
+    cursoObj = conn.cursor()
+    cursoObj.execute(sql)
+    proveedores= cursoObj.fetchall()  # [ [47,"Monitor",368000.0,23], [99,"Mouse",25000.0,64] ]
+    print(proveedores)
+    return proveedores
 
 
 

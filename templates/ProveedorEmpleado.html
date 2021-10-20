@@ -103,8 +103,8 @@
         
         <div class="table-responsive">
    
-          <form class="d-flex">
-            <input class="form-control me-sm-2" type="text" placeholder="Buscar">
+          <form class="d-flex" action="{{ url_for('consulta_proveedor_empleado') }}" method="post" onsubmit="">
+            <input class="form-control me-sm-2" type="text" placeholder="Buscar" name="nombre" id="nombre">
             <button class="btn btn-secondary my-2 my-sm-0" type="submit">Buscar</button>
           </form>
   
@@ -113,28 +113,39 @@
       
   
           <table class="table table-hover">
+
+
             <thead>
               <tr>
                 <th class="table-primary" scope="col">Id</th>
                 <th class="table-primary" scope="col">Nombre</th>
                 <th class="table-primary" scope="col">Telefono</th>
                 <th class="table-primary" scope="col">Direccion</th>
-                 
+                <th class="table-primary" scope="col">Ciudad</th>
+                <th class="table-primary"  scope="col">Editar</th>  
+                <th class="table-primary" scope="col">Eliminar</th>              
               </tr>
             </thead>
+
             <tbody>
               <tr class="table-active">
-                <th  scope="row">001</th>
-                <td >Gabriel Betin</td>
-                <td >601 31 31 ext. 2323</td>
-                <td >Autopista sur 85-31</td>
-   
+              {% for proveedor in proveedores %}   
+              
+                <th  scope="row">{% print(proveedor[0]) %}</th>
+                <td >{% print(proveedor[1]) %}</td>
+                <td >{% print(proveedor[2]) %}</td>
+                <td >{% print(proveedor[3]) %}</td>
+                <td >{% print(proveedor[4]) %}</td>  
+                <td > <a href="#" onclick="editarProducto('{{proveedor[2]}}')">Editar</a>   </td>
+                <td > <a href="#" onclick="eliminarProducto('{{proveedor[2]}}')">Eliminar</a>   </td>
               </tr>
-                   
+              {% endfor %}                   
+              
+  
                      
             
             </tbody>
-          </table>    
+          </table> 
       
       </center>
     </main>

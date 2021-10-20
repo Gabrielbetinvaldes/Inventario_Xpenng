@@ -93,6 +93,8 @@
   
         <img src="{{ url_for('static', filename='img/productos.jpg') }}"  width="300" alt="Aqui va una imagen">  
         
+        <br>
+        <br>
         
         <form  name="formRegister"  action="{{ url_for('producto_admin') }}"  method="post" onsubmit=""> 
   
@@ -190,10 +192,10 @@
         
         <div class="table-responsive">
    
-            
-  
-          <table class="table table-hover">
+                  
+          
 
+          <table class="table table-hover">
             <thead>
               <tr>
                 <th class="table-primary" scope="col">Id</th>
@@ -207,24 +209,21 @@
                 <th class="table-primary" scope="col">Eliminar</th>              
               </tr>
             </thead>
-
             <tbody>
               <tr class="table-active">
-              {% for pro in productos %}   
-              
-                <th  scope="row">{% print(pro[0]) %}</th>
-                <td >{% print(pro[1]) %}</td>
-                <td >{% print(pro[2]) %}</td>
-                <td >{% print(pro[3]) %}</td>
-                <td >{% print(pro[4]) %}</td>  
-                <td >{% print(pro[5]) %}</td>
-                <td >{% print(pro[6]) %}</td>
-                <td > <a href="#" onclick="editarProducto('{{pro[2]}}')">Editar</a>   </td>
-                <td > <a href="#" onclick="eliminarProducto('{{pro[2]}}')">Eliminar</a>   </td>
-              </tr>
-              {% endfor %}                   
-              
-  
+                {% for pro in productos %}   
+                
+                  <th  scope="row">{% print(pro[0]) %}</th>
+                  <td >{% print(pro[1]) %}</td>
+                  <td >{% print(pro[2]) %}</td>
+                  <td >{% print(pro[3]) %}</td>
+                  <td >{% print(pro[4]) %}</td>  
+                  <td >{% print(pro[5]) %}</td>
+                  <td >{% print(pro[6]) %}</td>
+                  <td > <a href="#" onclick="editarProducto('{{pro[2]}}')">Editar</a>   </td>
+                  <td > <a href="#" onclick="eliminarProducto('{{pro[2]}}')">Eliminar</a>   </td>
+                </tr>
+                {% endfor %}  
                      
             
             </tbody>
