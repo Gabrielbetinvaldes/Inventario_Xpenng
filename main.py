@@ -129,30 +129,32 @@ def usuario_super():
     
     try:
         if request.method == 'POST':                  
-            usuario = request.form['usuario'].upper() 
-            email = request.form['email'].upper()        
+            usuario = request.form['usuario']
+            email = request.form['email']        
             password = str(random.randint(99999,999999))
             rol = request.form['rol'] 
               
 
             error = None
             db = get_db()
+            nom_cookies = request.cookies.get( 'username', 'Usuario')
 
             if not usuario:
-                error = "Usuario requerido."
+                error = '{}, El Usuario  es requerido.'.format(nom_cookies)
                 flash(error)
             if not email:
-                error = "Email requerido."
+                error = '{}, El Email es  requerido.'.format(nom_cookies)
                 flash(error)
             if not rol:
-                error = "Rol requerido."
+                error = '{}, El Rol es requerido.'.format(nom_cookies)
                 flash(error)  
 
             if not isUsernameValid(usuario):
+                
                 error = "El usuario debe ser alfanumerico o incluir solo '.','_','-'"
                 flash(error)
             if not isEmailValid(email):
-                error = 'Correo invalido'
+                error = '{}, El Correo es requerido.'.format(nom_cookies)
                 flash(error)
                 #if not isPasswordValid(password):
                 #    error = 'La contraseña debe contener al menos una minúscula, una mayúscula, un número y 8 caracteres'
@@ -163,7 +165,7 @@ def usuario_super():
                 ).fetchone()
             print(user_email)
             if user_email is not None:
-                error = "Email ya existe."
+                error = '{}, El email ya existe.'.format(nom_cookies)
                 flash(error)   
             
             if error is not None:
@@ -177,15 +179,15 @@ def usuario_super():
                     )
                                 
                 db.commit()
-                flash('Usuario creado') 
+                flash('{}, Usuario creado.'.format(nom_cookies)) 
 
                 yag = yagmail.SMTP('gabetin@uninorte.edu.co', 'Domayor7') 
                 yag.send(to=email, subject='Activa tu cuenta',
-                    contents='Bienvenido, revisa el siguiente link e ingresa con su usuario: '+ usuario + ' cd y contraseña: '  + password + '\n'+ '\n' +'http://127.0.0.1:5000/' )
+                    contents='Bienvenido, revisa el siguiente link e ingresa con su usuario: '+ usuario + ' y contraseña: '  + password + '\n'+ '\n' +'http://127.0.0.1:5000/' )
                                 
         return render_template("UsuarioSuper.html")
     except:
-        flash('Falló en el proceso.')
+        flash('{}, El proceso falló.'.format(nom_cookies))
         return render_template("UsuarioSuper.html")
 
 #---------------------------------------------------------------------------------------------------------
