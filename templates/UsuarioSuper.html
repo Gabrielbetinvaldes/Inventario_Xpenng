@@ -15,11 +15,40 @@
   <button class="navbar-toggler position-absolute d-md-none collapsed " type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
+   
+  <div class="navbar-nav col-7 ">
   
+   </div>
+   
+
   <div class="navbar-nav ">
+  
+    <img src="{{ url_for('static', filename='img/usuario.png') }}"  width="30"  alt="Aqui va una imagen" >
+     
+
+  </div>
+
+  <div class="navbar-nav  ">
+  
+
+    
+    <a class="nav-link col-md-3 col-lg-2 me-0 px-3" href="">{{g.user[4]}}</a> 
+   
+
+  </div>
+
+
+
+
+  <div class="navbar-nav ">
+  
+       
     <div class="nav-item text-nowrap  bg-primary">
-      <a class="nav-link px-3  bg-primary" href="/logout">Salir</a>
+      
+      
+      <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 bg-primary" href="/logout">Salir</a>
     </div>
+
   </div>
 </header>
 

@@ -54,8 +54,11 @@ function editarUsuario(usuario){
 
  
 
- function editarProveedor (){
-    window.open("/Dashboard/ProveedorUsuario/editarProveedor","ventana4","width=500,height=500,scrollbars=NO")
+ function editarProveedor (proveedor){
+    window.open("/Dashboard/ProveedorUsuario/editarProveedor/"+proveedor + "","ventana4","width=500,height=550,scrollbars=NO")
  }
 
+ function eliminarProveedor (proveedor){
+   window.open("/Dashboard/ProveedorUsuario/eliminarProveedor/"+proveedor + "","ventana4","width=500,height=550,scrollbars=NO")
+}
 

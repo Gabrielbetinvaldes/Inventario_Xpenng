@@ -58,7 +58,7 @@ def sesion():
     if request.method == 'POST':
         db = get_db()
         usuario = request.form['usuario']
-        password = request.form['contraseña'] 
+        password = request.form['contraseña']
 
         error = None
 
@@ -109,7 +109,7 @@ def cargar_usuario_registrado():
         
     else:
         g.user = get_db().execute(
-            'SELECT id_usuario, usuario, contrasena, rol FROM Usuarios WHERE id_usuario = ?'
+            'SELECT id_usuario, usuario, contrasena, rol, email FROM Usuarios WHERE id_usuario = ?'
             ,
             (id_usuario,)
             
@@ -129,8 +129,8 @@ def usuario_super():
     
     try:
         if request.method == 'POST':                  
-            usuario = request.form['usuario'] 
-            email = request.form['email']        
+            usuario = request.form['usuario'].upper() 
+            email = request.form['email'].upper()        
             password = str(random.randint(99999,999999))
             rol = request.form['rol'] 
               
@@ -196,7 +196,7 @@ def usuario_super():
 def consulta_super():
 
     if request.method == 'POST':  
-        usuario = request.form['usuario']
+        usuario = request.form['usuario'].upper()
 
         if not usuario:
             usuarios = sql_select_usuarios()
@@ -219,7 +219,7 @@ def consulta_super():
 def consulta_admin():
 
     if request.method == 'POST':  
-        usuario = request.form['usuario']
+        usuario = request.form['usuario'].upper()
 
         if not usuario:
             usuarios = sql_select_usuarios()
@@ -244,9 +244,9 @@ def consulta_admin():
 @login_required
 def editar_usuario(nom_usuario):
     if request.method == 'POST':                  
-            usuario = request.form['usuario'] 
-            email = request.form['email']        
-            rol = request.form['rol']    
+            usuario = request.form['usuario'].upper() 
+            email = request.form['email'].upper()        
+            rol = request.form['rol'].upper()    
 
             error = None
             db = get_db()
@@ -297,7 +297,7 @@ def editar_usuario(nom_usuario):
 @login_required    
 def eliminar_usuario(nom_usuario):
     if request.method == 'POST':                  
-            usuario = request.form['usuario']         
+            usuario = request.form['usuario'].upper()         
                
 
             error = None
@@ -342,12 +342,12 @@ def eliminar_usuario(nom_usuario):
 def producto_admin():
 
     if request.method == 'POST':                  
-            codigo = request.form['codigo']         
-            nombre = request.form['nombre']
-            descripcion = request.form['descripcion']
+            codigo = request.form['codigo'].upper()         
+            nombre = request.form['nombre'].upper()
+            descripcion = request.form['descripcion'].upper()
             cant_minima = request.form['cant_minima']         
             stock = request.form['stock']
-            proveedor = request.form['proveedor']      
+            proveedor = request.form['proveedor'].upper()      
 
             error = None
             db = get_db()
@@ -369,7 +369,20 @@ def producto_admin():
                 flash(error)
             if not proveedor:
                 error = "Proveedor requerido."
-                flash(error)       
+                flash(error)    
+
+
+            id_proveedor = db.execute(
+            'SELECT id_proveedor, nombre,telefono,direccion, ciudad FROM Proveedores WHERE nombre = ?', 
+            (proveedor,) 
+            ).fetchone()
+            print(id_proveedor)
+
+            if id_proveedor is None:
+                error = '{}, EL proveedor no existe.'
+                flash(error)
+
+
 
             codigo_producto = db.execute(
                 'SELECT * FROM Productos WHERE codigo = ? ', (codigo,) 
@@ -385,7 +398,7 @@ def producto_admin():
           
                 db.execute(
                     'INSERT INTO Productos (codigo,nombre,descripcion,cant_minima,stock,id_proveedor) VALUES (?,?,?,?,?,?)',
-                    (codigo,nombre,descripcion,cant_minima,stock,proveedor)
+                    (codigo,nombre,descripcion,cant_minima,stock,id_proveedor[0])
                     )
                                 
                 db.commit()
@@ -405,7 +418,7 @@ def consulta_producto_admin():
     if request.method == 'POST':
    
 
-        nombre = request.form['producto']
+        nombre = request.form['producto'].upper()
         minima =request.values.get('minima')
        
        
@@ -413,26 +426,36 @@ def consulta_producto_admin():
         if not nombre and  minima == 'minima'  :                         
             db = get_db()
             productos = db.execute(
-            'SELECT * FROM Productos WHERE stock <  cant_minima'
+            'SELECT * FROM Productos INNER JOIN Proveedores ON Productos.id_proveedor = Proveedores.id_Proveedor WHERE stock <  cant_minima'
             ).fetchall()
+
+           
         elif not nombre and  minima is None :            
-            productos = sql_select_productos()
+            db = get_db()
+            productos = db.execute(
+            'SELECT * FROM Productos INNER JOIN Proveedores ON Productos.id_proveedor = Proveedores.id_Proveedor '
+            ).fetchall()
+            print(productos)
+            
+          
         elif nombre and minima == 'minima': 
             flash('La opcion de cantidad minima muestra todos los productos en general cuando tengan un stock por debajo del minimo')
             db = get_db()
             productos = db.execute(
-            'SELECT * FROM Productos WHERE stock <  cant_minima'
-            ).fetchall()   
+            'SELECT * FROM Productos INNER JOIN Proveedores ON Productos.id_proveedor = Proveedores.id_Proveedor WHERE stock <  cant_minima'
+            ).fetchall() 
+            
         else: 
             db = get_db()
             productos = db.execute(
-            'SELECT * FROM Productos WHERE nombre = ? ', (nombre,) 
+            'SELECT * FROM Productos INNER JOIN Proveedores ON Productos.id_proveedor = Proveedores.id_Proveedor WHERE Productos.nombre = ? ', (nombre,) 
             ).fetchall()
+          
             if len(productos) < 1 :
                error = "Producto NO existe."
                flash(error)     
     
-    return render_template("ProductoAdmin.html", productos=productos)
+    return render_template("ProductoAdmin.html", productos=productos )
 
 
 
@@ -443,7 +466,7 @@ def consulta_producto_usuario():
     if request.method == 'POST':
    
 
-        nombre = request.form['producto']
+        nombre = request.form['producto'].upper()
         minima =request.values.get('minima')
        
        
@@ -451,20 +474,25 @@ def consulta_producto_usuario():
         if not nombre and  minima == 'minima'  :                         
             db = get_db()
             productos = db.execute(
-            'SELECT * FROM Productos WHERE stock <  cant_minima'
+            'SELECT * FROM Productos INNER JOIN Proveedores ON Productos.id_proveedor = Proveedores.id_Proveedor WHERE stock <  cant_minima'
             ).fetchall()
-        elif not nombre and  minima is None :            
-            productos = sql_select_productos()
+        elif not nombre and  minima is None : 
+            db = get_db()           
+            productos = db.execute(
+            'SELECT * FROM Productos INNER JOIN Proveedores ON Productos.id_proveedor = Proveedores.id_Proveedor '
+            ).fetchall()
+            print(productos)
+            
         elif nombre and minima == 'minima': 
             flash('La opcion de cantidad minima muestra todos los productos en general cuando tengan un stock por debajo del minimo')
             db = get_db()
             productos = db.execute(
-            'SELECT * FROM Productos WHERE stock <  cant_minima'
+            'SELECT * FROM Productos INNER JOIN Proveedores ON Productos.id_proveedor = Proveedores.id_Proveedor WHERE stock <  cant_minima'
             ).fetchall()    
         else: 
             db = get_db()
             productos = db.execute(
-            'SELECT * FROM Productos WHERE nombre = ? ', (nombre,) 
+            'SELECT * FROM Productos INNER JOIN Proveedores ON Productos.id_proveedor = Proveedores.id_Proveedor WHERE Productos.nombre = ? ', (nombre,) 
             ).fetchall()
             if len(productos) < 1 :
                error = "Producto NO existe."
@@ -484,12 +512,12 @@ def consulta_producto_usuario():
 def editar_producto(nom_producto):
     if request.method == 'POST':  
 
-            codigo = request.form['codigo']         
-            nombre = request.form['nombre']
-            descripcion = request.form['descripcion']
+            codigo = request.form['codigo'].upper()         
+            nombre = request.form['nombre'].upper()
+            descripcion = request.form['descripcion'].upper()
             cant_minima = request.form['cant_minima']         
             stock = request.form['stock']
-            proveedor = request.form['proveedor']   
+            proveedor = request.form['proveedor'].upper()   
 
             error = None
             db = get_db()
@@ -552,7 +580,7 @@ def editar_producto(nom_producto):
 @login_required    
 def eliminar_producto(nom_producto):
     if request.method == 'POST':                  
-            nombre = request.form['nombre']         
+            nombre = request.form['nombre'].upper()         
                
 
             error = None
@@ -597,10 +625,10 @@ def proveedor_admin():
 
     if request.method == 'POST':                  
                    
-            nombre = request.form['nombre']
-            telefono = request.form['telefono']
-            direccion = request.form['direccion']         
-            ciudad = request.form['ciudad']
+            nombre = request.form['nombre'].upper()
+            telefono = request.form['telefono'].upper()
+            direccion = request.form['direccion'].upper()         
+            ciudad = request.form['ciudad'].upper()
                   
 
             error = None
@@ -651,7 +679,7 @@ def proveedor_admin():
 def consulta_proveedor_admin():
 
     if request.method == 'POST':  
-        proveedor = request.form['nombre']
+        proveedor = request.form['nombre'].upper()
 
         if not proveedor:
             proveedores = sql_select_proveedores()
@@ -674,7 +702,7 @@ def consulta_proveedor_admin():
 def consulta_proveedor_empleado():
 
     if request.method == 'POST':  
-        proveedor = request.form['nombre']
+        proveedor = request.form['nombre'].upper()
 
         if not proveedor:
             proveedores = sql_select_proveedores()
@@ -690,6 +718,108 @@ def consulta_proveedor_empleado():
             
   
     return render_template("ProveedorEmpleado.html", proveedores=proveedores)
+
+# Editar proveedor
+
+@app.route('/Dashboard/ProveedorUsuario/editarProveedor/<nom_proveedor>', methods=['GET', 'POST'])
+@app.route('/Dashboard/ProveedorAdmin/editarProveedor/<nom_proveedor>', methods=['GET', 'POST'])
+
+@login_required
+def editar_proveedor(nom_proveedor):
+    if request.method == 'POST':  
+
+            nombre = request.form['nombre'].upper()
+            telefono = request.form['telefono'].upper()
+            direccion = request.form['direccion'].upper()         
+            ciudad = request.form['ciudad'].upper()
+                  
+
+            error = None
+            db = get_db()
+
+           
+            if not nombre:
+                error = "Nombre requerido."
+                flash(error)
+            if not telefono:
+                error = "Numero telefonico requerido."
+                flash(error)
+            if not direccion:
+                error = "Direccion requerida."
+                flash(error)
+            if not ciudad:
+                error = "Ciudad requerida."
+                flash(error)      
+
+                   
+            if error is not None:
+                return render_template("editarProveedor.html")
+            else:
+                          
+                db.execute(
+                    'UPDATE Proveedores SET nombre = ?, telefono = ?, direccion = ?, ciudad =? WHERE nombre = ?',
+                    (nombre,telefono,direccion,ciudad,nombre )
+                    )
+                                             
+                db.commit()
+                flash('Proveedor Editado')
+                proveedores = db.execute(
+                    'SELECT * FROM Proveedores WHERE nombre = ? ', (nom_proveedor,) 
+                    ).fetchall()
+                print(proveedores)   
+                return render_template("editarProveedor.html",  proveedores = proveedores , nom_proveedor=nom_proveedor)
+         
+    else:
+              
+        db = get_db()
+        proveedores = db.execute(
+            'SELECT * FROM Proveedores WHERE nombre = ? ', (nom_proveedor,) 
+            ).fetchall()
+        print(proveedores)   
+        return render_template("editarProveedor.html",    proveedores = proveedores , nom_proveedor=nom_proveedor)
+
+
+#Para Eliminar proveedor
+
+@app.route('/Dashboard/ProveedorUsuario/eliminarProveedor/<nom_proveedor>', methods=['GET', 'POST'])
+@app.route('/Dashboard/ProveedorAdmin/eliminarProveedor/<nom_proveedor>', methods=['GET', 'POST'])
+@login_required    
+def eliminar_proveedor(nom_proveedor):
+    if request.method == 'POST':                  
+            nombre = request.form['nombre'].upper()         
+               
+
+            error = None
+            db = get_db()
+
+            if not nombre:
+                error = "Nombre del proveedor requerido."
+                flash(error)
+                             
+            if error is not None:
+                return render_template("eliminarProveedor.html")
+            else:
+            
+                db.execute(
+                    'DELETE FROM Proveedores WHERE nombre = ?',
+                    (nombre,)
+                    )
+                                            
+                db.commit()
+                
+                return render_template("eliminarMensajeProveedor.html")
+            
+
+
+    else:
+        db = get_db()
+        proveedores = db.execute(
+            'SELECT * FROM Proveedores WHERE nombre = ? ', (nom_proveedor,) 
+            ).fetchall()
+        print(proveedores)
+        
+        return render_template("eliminarProveedor.html",  proveedores = proveedores , nom_proveedor=nom_proveedor)
+
 
 #------------------------------------------------------------------------------------------------
 
@@ -708,24 +838,13 @@ def usuario_admin():
 def producto_usuario():
     return render_template("ProductoUsuario.html")
 
-
-# ------------------
-       
-
-
+ 
 
 @app.route('/Dashboard/ProveedorEmpleado', methods=['GET', 'POST'])
 @login_required
 def proveedor_empleado():
     return render_template("ProveedorEmpleado.html")   
-
-
-
-@app.route('/Dashboard/ProveedorUsuario/editarProveedor', methods=['GET', 'POST'])
-@app.route('/Dashboard/ProveedorAdmin/editarProveedor', methods=['GET', 'POST'])
-@login_required
-def editar_proveedor():
-    return render_template("editarProveedor.html")    
+  
 
 
 @app.route('/logout')
