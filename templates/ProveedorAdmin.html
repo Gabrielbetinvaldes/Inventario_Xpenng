@@ -71,12 +71,12 @@
         
         {% if g.user[3] == '1' %}
 
-        <a class="nav-link active" aria-current="page" href="/Dashboard/UsuarioSuper">Crear Usuarios</a>
-        <a class="nav-link active" aria-current="page" href="/Dashboard/UsuarioAdmin">Gestionar Usuarios</a>
+        <a class="nav-link active" aria-current="page" href="/sadmin/perfil/crear">Crear Usuarios</a>
+        <a class="nav-link active" aria-current="page" href="/sadmin/perfil">Gestionar Usuarios</a>
         
         {% elif g.user[3] == '2' %}
 
-        <a class="nav-link active" aria-current="page" href="/Dashboard/UsuarioAdmin">Gestionar Usuarios</a>
+        <a class="nav-link active" aria-current="page" href="/admin/perfil">Gestionar Usuarios</a>
         
         {% else %}
 
@@ -98,21 +98,24 @@
     <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
       <div class="accordion-body">
 
+       
         {% if g.user[3] == '1' %}
 
-        <a class="nav-link active" aria-current="page" href="/Dashboard/ProductoAdmin">Crear Productos</a>
-        <a class="nav-link active" aria-current="page" href="/Dashboard/ProductoUsuario">Gestionar Productos</a>
+        <a class="nav-link active" aria-current="page" href="/sadmin/productos/crear">Crear Productos</a>
+        <a class="nav-link active" aria-current="page" href="/sadmin/productos">Gestionar Productos</a>
       
 
         {% elif g.user[3] == '2' %}
 
-        <a class="nav-link active" aria-current="page" href="/Dashboard/ProductoAdmin">Crear Productos</a>
+        <a class="nav-link active" aria-current="page" href="/admin/productos/crear">Crear Productos</a>
       
         {% else %}
 
-        <a class="nav-link active" aria-current="page" href="/Dashboard/ProductoUsuario">Gestionar Productos</a>
+        <a class="nav-link active" aria-current="page" href="/productos">Gestionar Productos</a>
 
-        {% endif %}      </div>
+        {% endif %}     
+      
+      </div>
     </div>
   </div>
 
@@ -128,17 +131,17 @@
 
         {% if g.user[3] == '1' %}
 
-        <a class="nav-link active" aria-current="page" href="/Dashboard/ProveedorAdmin">Crear Proveedor</a>
-        <a class="nav-link active" aria-current="page" href="/Dashboard/ProveedorEmpleado">Buscar Proveedor</a>
+        <a class="nav-link active" aria-current="page" href="/sadmin/proveedores/crear">Crear Proveedor</a>
+        <a class="nav-link active" aria-current="page" href="/sadmin/proveedores">Buscar Proveedor</a>
       
 
         {% elif g.user[3] == '2' %}
 
-        <a class="nav-link active" aria-current="page" href="/Dashboard/ProveedorAdmin">Crear Proveedor</a>
+        <a class="nav-link active" aria-current="page" href="/admin/proveedores/crear">Crear Proveedor</a>
       
         {% else  %}
 
-        <a class="nav-link active" aria-current="page" href="/Dashboard/ProveedorEmpleado">Buscar Proveedor</a>
+        <a class="nav-link active" aria-current="page" href="/proveedores">Buscar Proveedor</a>
 
         
         

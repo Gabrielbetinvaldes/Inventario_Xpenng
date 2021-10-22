@@ -28,7 +28,7 @@ function editarUsuario(usuario){
 
  
    
-   window.open("/Dashboard/UsuarioSuper/editarUsuario/"  + usuario +"", "ventana1","width=500,height=500,scrollbars=NO");
+   window.open("/editarUsuario/"  + usuario +"", "ventana1","width=500,height=500,scrollbars=NO");
      
   
   }
@@ -36,7 +36,7 @@ function editarUsuario(usuario){
 
 
  function eliminarUsuario (usuario){
-    window.open("/Dashboard/UsuarioSuper/eliminarUsuario/" +usuario+ "","ventana2","width=500,height=300,scrollbars=NO")
+    window.open("/eliminarUsuario/" +usuario+ "","ventana2","width=500,height=300,scrollbars=NO")
  }
 
 
@@ -45,20 +45,20 @@ function editarUsuario(usuario){
 
 
  function editarProducto (producto){
-    window.open("/Dashboard/ProductoUsuario/editarProducto/"+producto+"","ventana3","width=500,height=700,scrollbars=NO")
+    window.open("/editarProducto/"+producto+"","ventana3","width=500,height=700,scrollbars=NO")
  }
 
  function eliminarProducto(producto){
-   window.open("/Dashboard/ProductoUsuario/eliminarProducto/" +producto+ "","ventana2","width=500,height=300,scrollbars=NO")
+   window.open("/eliminarProducto/" +producto+ "","ventana2","width=500,height=300,scrollbars=NO")
 }
 
  
 
  function editarProveedor (proveedor){
-    window.open("/Dashboard/ProveedorUsuario/editarProveedor/"+proveedor + "","ventana4","width=500,height=550,scrollbars=NO")
+    window.open("/editarProveedor/"+proveedor + "","ventana4","width=500,height=550,scrollbars=NO")
  }
 
  function eliminarProveedor (proveedor){
-   window.open("/Dashboard/ProveedorUsuario/eliminarProveedor/"+proveedor + "","ventana4","width=500,height=550,scrollbars=NO")
+   window.open("/eliminarProveedor/"+proveedor + "","ventana4","width=500,height=550,scrollbars=NO")
 }
 

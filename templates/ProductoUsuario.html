@@ -70,12 +70,12 @@
 
         {% if g.user[3] == '1' %}
 
-        <a class="nav-link active" aria-current="page" href="/Dashboard/UsuarioSuper">Crear Usuarios</a>
-        <a class="nav-link active" aria-current="page" href="/Dashboard/UsuarioAdmin">Gestionar Usuarios</a>
+        <a class="nav-link active" aria-current="page" href="/sadmin/perfil/crear">Crear Usuarios</a>
+        <a class="nav-link active" aria-current="page" href="/sadmin/perfil">Gestionar Usuarios</a>
         
         {% elif g.user[3] == '2' %}
 
-        <a class="nav-link active" aria-current="page" href="/Dashboard/UsuarioAdmin">Gestionar Usuarios</a>
+        <a class="nav-link active" aria-current="page" href="/admin/perfil">Gestionar Usuarios</a>
         
         {% else %}
 
@@ -99,19 +99,19 @@
 
         {% if g.user[3] == '1' %}
 
-        <a class="nav-link active" aria-current="page" href="/Dashboard/ProductoAdmin">Crear Productos</a>
-        <a class="nav-link active" aria-current="page" href="/Dashboard/ProductoUsuario">Gestionar Productos</a>
+        <a class="nav-link active" aria-current="page" href="/sadmin/productos/crear">Crear Productos</a>
+        <a class="nav-link active" aria-current="page" href="/sadmin/productos">Gestionar Productos</a>
       
 
         {% elif g.user[3] == '2' %}
 
-        <a class="nav-link active" aria-current="page" href="/Dashboard/ProductoAdmin">Crear Productos</a>
+        <a class="nav-link active" aria-current="page" href="/admin/productos/crear">Crear Productos</a>
       
         {% else %}
 
-        <a class="nav-link active" aria-current="page" href="/Dashboard/ProductoUsuario">Gestionar Productos</a>
+        <a class="nav-link active" aria-current="page" href="/productos">Gestionar Productos</a>
 
-        {% endif %}      
+        {% endif %}         
       </div>
     </div>
   </div>
@@ -128,17 +128,17 @@
 
         {% if g.user[3] == '1' %}
 
-        <a class="nav-link active" aria-current="page" href="/Dashboard/ProveedorAdmin">Crear Proveedor</a>
-        <a class="nav-link active" aria-current="page" href="/Dashboard/ProveedorEmpleado">Buscar Proveedor</a>
+        <a class="nav-link active" aria-current="page" href="/sadmin/proveedores/crear">Crear Proveedor</a>
+        <a class="nav-link active" aria-current="page" href="/sadmin/proveedores">Buscar Proveedor</a>
       
 
         {% elif g.user[3] == '2' %}
 
-        <a class="nav-link active" aria-current="page" href="/Dashboard/ProveedorAdmin">Crear Proveedor</a>
+        <a class="nav-link active" aria-current="page" href="/admin/proveedores/crear">Crear Proveedor</a>
       
         {% else  %}
 
-        <a class="nav-link active" aria-current="page" href="/Dashboard/ProveedorEmpleado">Buscar Proveedor</a>
+        <a class="nav-link active" aria-current="page" href="/proveedores">Buscar Proveedor</a>
 
         
         
@@ -228,9 +228,7 @@
                 <th class="table-primary" scope="col">Cantidad Minima Rquerida</th>
                 <th class="table-primary"  scope="col">Stock</th>
                 <th class="table-primary"  scope="col">Proveedor</th> 
-                <th class="table-primary"  scope="col">Editar</th>  
-                <th class="table-primary" scope="col">Eliminar</th>  > 
-           
+               
               </tr>
             </thead>
             <tbody>
@@ -244,8 +242,6 @@
                   <td >{% print(pro[4]) %}</td>  
                   <td >{% print(pro[5]) %}</td>
                   <td >{% print(pro[8]) %}</td>
-                  <td > <a href="#" onclick="editarProducto('{{pro[2]}}')">Editar</a>   </td>
-                  <td > <a href="#" onclick="eliminarProducto('{{pro[2]}}')">Eliminar</a>   </td>
                 </tr>
                 {% endfor %}  
                      
