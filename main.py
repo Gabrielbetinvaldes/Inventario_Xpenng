@@ -246,9 +246,9 @@ def consulta_admin():
 @login_required
 def editar_usuario(nom_usuario):
     if request.method == 'POST':                  
-            usuario = request.form['usuario'].upper() 
-            email = request.form['email'].upper()        
-            rol = request.form['rol'].upper()    
+            usuario = request.form['usuario']
+            email = request.form['email']  
+            rol = request.form['rol'] 
 
             error = None
             db = get_db()
@@ -269,7 +269,7 @@ def editar_usuario(nom_usuario):
             else:
             # Seguro:
                 db.execute(
-                    'UPDATE Usuarios SET usuario = ?,rol = ?, email =? WHERE usuario = ?',
+                    'UPDATE Usuarios SET usuario = ?,rol = ?, email = ? WHERE usuario = ?',
                     (usuario,rol,email,usuario)
                     )
                                              
@@ -299,7 +299,7 @@ def editar_usuario(nom_usuario):
 @login_required    
 def eliminar_usuario(nom_usuario):
     if request.method == 'POST':                  
-            usuario = request.form['usuario'].upper()         
+            usuario = request.form['usuario']        
                
 
             error = None
@@ -541,23 +541,31 @@ def editar_producto(nom_producto):
                 flash(error)
             if not proveedor:
                 error = "Proveedor requerido."
-                flash(error)       
+                flash(error)  
+
+
+            id_proveedor = db.execute(
+            'SELECT id_proveedor, nombre,telefono,direccion, ciudad FROM Proveedores WHERE nombre = ?', 
+            (proveedor,) 
+            ).fetchone()
+            print(id_proveedor)
+
+            if id_proveedor is None:
+                error = '{}, EL proveedor no existe.'
+                flash(error)         
 
                    
             if error is not None:
                 return render_template("editarProducto.html")
-            else:
-            
-               
+            else:         
                 db.execute(
-                    'UPDATE Productos SET codigo = ?,nombre = ?,descripcion = ?, cant_minima =?, stock = ?, proveedor = ? WHERE nombre = ?',
-                    (codigo,nombre,descripcion,cant_minima,stock,proveedor,nombre )
-                    )
-                                             
+                    'UPDATE Productos SET codigo = ?,nombre = ?,descripcion = ?, cant_minima =?, stock = ?, id_proveedor = ? WHERE nombre = ?',
+                    (codigo,nombre,descripcion,cant_minima,stock,id_proveedor[0],nombre)
+                    )                                             
                 db.commit()
                 flash('Producto Editado')
                 productos = db.execute(
-                    'SELECT * FROM Productos WHERE nombre = ? ', (nom_producto,) 
+                    'SELECT * FROM Productos INNER JOIN Proveedores ON Productos.id_proveedor = Proveedores.id_Proveedor  WHERE Productos.nombre = ? ', (nom_producto,) 
                     ).fetchall()
                 print(productos)   
                 return render_template("editarProducto.html",  productos = productos , nom_producto=nom_producto)
@@ -566,7 +574,7 @@ def editar_producto(nom_producto):
               
         db = get_db()
         productos = db.execute(
-            'SELECT * FROM Productos WHERE nombre = ? ', (nom_producto,) 
+            'SELECT * FROM Productos INNER JOIN Proveedores ON Productos.id_proveedor = Proveedores.id_Proveedor WHERE  Productos.nombre = ? ', (nom_producto,)
             ).fetchall()
         print(productos)   
         return render_template("editarProducto.html",   productos = productos , nom_producto=nom_producto)
