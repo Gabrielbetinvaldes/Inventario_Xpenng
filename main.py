@@ -900,7 +900,6 @@ def sql_select_proveedores():
 
 #--------------------------------------------------------------------------------------------------
 
-
 #Metodo Main
    
 
@@ -908,5 +907,10 @@ if __name__ == "__main__":
     print("Entró en el IF.")
     app.run(debug=True, port=5000)           
 
+
+
+
+
+    
 
     
